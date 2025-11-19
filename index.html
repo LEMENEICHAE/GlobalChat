@@ -127,7 +127,7 @@
       }
       if (!isAllowedEmail(user.email)) {
         // Not allowed email -> redirect to notallowed page
-        window.location.href = 'https://brooklynnxx.github.io/GlobalChat/notallowed.html';
+        window.location.href = 'notallowed.html';
         return;
       }
 
@@ -142,14 +142,32 @@
 
       const userSnapshot = await db.ref('users/' + user.uid).get();
       const userInfo = userSnapshot.val();
+      const notAllowedDisplayNames = ["Vagina", "Penis", "Nigger", "Nigga", "Goon", "Homophobic", "Sex", "Abuse", "Stalker", "Kill", "Murder", "Jizz", "Homemade Special Sauce", "Cum", "Squirt", "Cream", "Transphobic", "Fuck"]
 
+      
       if (!userInfo || !userInfo.displayName) {
         let displayName = null;
+
         while (!displayName) {
           displayName = prompt('Welcome! Please enter your display name:');
           if (displayName) displayName = displayName.trim();
-          if (!displayName) alert('Display name cannot be empty!');
-        }
+
+          if (!displayName) {
+            alert('Display name cannot be empty!');
+            continue;
+          }
+
+    // Check for forbidden words (case-insensitive)
+    const lowerName = displayName.toLowerCase();
+    const containsForbidden = notAllowedDisplayNames.some(word =>
+      lowerName.includes(word.toLowerCase())
+    );
+
+    if (containsForbidden) {
+      alert('This display name contains words that are not allowed. Please choose another one.');
+      displayName = null;
+    }
+  }
         const profilePicUrl = userInfo?.profilePic || null;
         await db.ref('users/' + user.uid).set({
           email: user.email,
